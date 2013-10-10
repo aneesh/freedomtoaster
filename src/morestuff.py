@@ -1,8 +1,5 @@
 import os
 import re
-from xml.dom.ext.reader import Sax2
-from xml.dom.NodeFilter import NodeFilter
-from xml.dom import minidom, Node
 import gtk
 
 from globals import *
@@ -26,52 +23,30 @@ def populateIsoList():
     
     filelist = os.listdir(MORESTUFF)
     filelist.sort()
-    
+    print filelist
     # for every file in the directory
     for filename in filelist:
-        #~ print filename
-        # find xml files
-        if re.search('\.xml$', filename):
-            
-            # data about this iso will be stored in here:
-            iso = Iso()
-            
-            # read the xml file
-            reader = Sax2.Reader()
-            doc = reader.fromStream('file://' + MORESTUFF + filename)
-            
-            for node in doc.documentElement.childNodes:
-                if node.nodeType == Node.ELEMENT_NODE:
-                    
-                    #~ print node.nodeName + ' -> ' + node.firstChild.nodeValue
-                    
-                    if node.firstChild:
-                        nodeValue = node.firstChild.nodeValue
-                    else:
-                        # this happens for an empty tag
-                        continue
-                    
-                    if node.nodeName == 'displayname':
-                        iso.displayname = nodeValue
-                    elif node.nodeName == 'category':
-                        iso.category = nodeValue
-                    elif node.nodeName == 'description':
-                        iso.description = nodeValue
-                    elif node.nodeName == 'longdescription':
-                        iso.longdescription = nodeValue
-                    elif node.nodeName == 'picture':
-                        iso.picture = ISOIMAGEPATH + nodeValue
-                    elif node.nodeName == 'filename':
-                        iso.filename = ISOPATH + nodeValue
-                    elif node.nodeName == 'type':
-                        iso.type = nodeValue
-                    
-            isoList.append(iso)
-            numIsos += 1
+	 iso=Iso()			#This is almost similar to what you will find in isolist.py. If you are looking for comments, you'll find them in isolist.py
+         image_name=re.split('-|_|[0-9]*',filename,1)[0]+'.png'
+         desc_file_name=re.split('-|_|[0-9]*',filename,1)[0]+'.txt'
+         
         
-        if numIsos >= 100:
-            break
-            
+	 iso.displayname=filename
+	 iso.category='noidea'
+	 iso.description=filename
+	 desc_file_path=HOMEDIR+'/src/text/'+desc_file_name
+	 try:
+	    desc_file=open(desc_file_path)
+	 except:
+	    desc_file=open(HOMEDIR+'/src/text/default.txt')
+	 iso.longdescription=desc_file.readlines()
+	 
+         iso.picture=ISOIMAGEPATH+image_name
+         iso.filename=filename
+         iso.type='DVD'
+         
+         isoList.append(iso)
+         
     return isoList
 
 def retnumisos():
